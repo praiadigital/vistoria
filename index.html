@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vistoria Digital — entrada e saída sem dor de cabeça</title>
+<meta name="description" content="Checklist de vistoria de entrada/saída por cômodo para locação de temporada. Satélite da rede praia.digital">
+<style>
+body{margin:0;font-family:system-ui,sans-serif;background:#eff6ff;color:#172554;min-height:100vh}
+header{padding:24px;text-align:center;background:linear-gradient(120deg,#1e40af,#3b82f6);color:#fff}
+nav a{color:#fde047;margin:0 8px;text-decoration:none;font-size:14px}
+.wrap{max-width:700px;margin:auto;padding:24px}
+.panel{background:#fff;border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 6px 18px rgba(30,64,175,.1)}
+.comodo{margin-bottom:16px}
+.comodo h3{color:#1e40af;margin-bottom:6px}
+.item{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed #bfdbfe}
+.item select{padding:6px;border-radius:8px;border:1px solid #bfdbfe}
+.item .ok{color:#16a34a;font-weight:700}.item .av{color:#dc2626;font-weight:700}
+.prog{height:10px;background:#dbeafe;border-radius:99px;overflow:hidden;margin-bottom:16px}
+.prog div{height:100%;background:#3b82f6;transition:width .3s}
+button.go{width:100%;background:#1e40af;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:700;cursor:pointer}
+#resumo{margin-top:12px;background:#eff6ff;border-radius:10px;padding:14px;font-size:14px;white-space:pre-wrap}
+footer{padding:20px;text-align:center;font-size:13px}
+footer a{color:#1e40af}
+</style></head>
+<body>
+<header><h1>🔍 Vistoria Digital</h1><p>Entrada e saída registradas em minutos, por cômodo</p>
+<nav><a href="https://praia.digital">Praia Digital</a><a href="https://praia.digital/contrato-temporada">Contrato</a><a href="https://praia.digital/area-anfitriao">Área do Anfitrião</a><a href="https://praia.digital/apps">Todos os apps</a></nav></header>
+<div class="wrap"><div class="panel">
+<div class="prog"><div id="bar" style="width:0"></div></div>
+<div id="comodos"></div>
+<button class="go" onclick="relatorio()">📋 Gerar relatório</button><div id="resumo"></div>
+</div></div>
+<footer>Rede <a href="https://praia.digital">praia.digital</a> · <a href="https://praia.digital/guia-hospede">Guia do Hóspede</a> · <a href="https://praia.digital/ferramentas-airbnb">Ferramentas Airbnb</a> · <a href="https://praia.digital/checklists-litoral">Checklists</a></footer>
+<script>
+const dados={
+'🛋️ Sala':['Sofá e poltronas','TV e controle','Ar-condicionado','Paredes e pintura','Janelas e cortinas'],
+'🍳 Cozinha':['Geladeira','Fogão e forno','Micro-ondas','Utensílios e louças','Pia e torneira'],
+'🛏️ Quartos':['Camas e colchões','Roupa de cama','Guarda-roupa','Ventilador/ar'],
+'🚿 Banheiros':['Chuveiro','Vaso sanitário','Espelho e box','Toalhas'],
+'🌴 Varanda/área':['Móveis externos','Churrasqueira','Piscina/quintal']};
+const KEY='vistoriapraia';let st=JSON.parse(localStorage.getItem(KEY)||'{}');
+const comodosDiv=document.getElementById('comodos');
+comodosDiv.innerHTML=Object.entries(dados).map(([c,itens])=>`<div class="comodo"><h3>${c}</h3>${itens.map(it=>{const k=c+it;const v=st[k]||'';return `<div class="item"><span style="flex:1">${it}</span><select onchange="set('${k}',this.value,this)"><option value="">—</option><option value="ok" ${v==='ok'?'selected':''}>✅ OK</option><option value="avaria" ${v==='avaria'?'selected':''}>⚠️ Avaria</option></select></div>`}).join('')}</div>`).join('');upd();
+function set(k,v,el){st[k]=v;localStorage.setItem(KEY,JSON.stringify(st));upd();}
+function upd(){const ks=Object.keys(st).filter(k=>st[k]);const tot=Object.values(dados).flat().length;bar.style.width=Math.round(ks.length/tot*100)+'%';}
+function relatorio(){const av=Object.entries(st).filter(([k,v])=>v==='avaria').map(([k])=>'⚠️ '+k);
+resumo.textContent=`RELATÓRIO DE VISTORIA — ${new Date().toLocaleDateString('pt-BR')}\nItens verificados: ${Object.keys(st).filter(k=>st[k]).length}\nAvarias encontradas: ${av.length}\n${av.join('\n')||'✅ Nenhuma avaria registrada.'}\n\nAnexe fotos e combine com o contrato: praia.digital/contrato-temporada`;}
+</script></body></html>
